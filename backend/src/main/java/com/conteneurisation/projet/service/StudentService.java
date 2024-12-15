@@ -23,10 +23,23 @@ public class StudentService {
 
     public void createStudent(StudentRequest studentRequest) {
         Student createdStudent = Student.builder()
-            .firstName(studentRequest.getName())
+            .firstName(studentRequest.getFirstName())
+            .lastName(studentRequest.getLastName())
+            .email(studentRequest.getEmail())
+            .phoneNumber(studentRequest.getPhoneNumber())
+            .gender(studentRequest.getGender())
+            .dateOfBirth(studentRequest.getDateOfBirth())
+            .department(studentRequest.getDepartment())
+            .major(studentRequest.getMajor())
+            .gpa(studentRequest.getGpa())
+            .yearOfStudy(studentRequest.getYearOfStudy())
+            .address(studentRequest.getAddress())
+            .nationality(studentRequest.getNationality())
+            .username(studentRequest.getUsername())
+            .password(studentRequest.getPassword())
             .enrollmentDate(LocalDate.now())
             .build();
 
-            studentRepository.save(createdStudent);
+        studentRepository.save(createdStudent);
     }
 }

@@ -12,6 +12,8 @@ const StudentsList = () => {
             .catch(err => console.error(err));
     }, []);
 
+    console.log(students);
+    
     const handleStudentDetail = (id) => {
         navigate(`/students/${id}`);
     };
@@ -44,10 +46,10 @@ const StudentsList = () => {
                                         {student.id}
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2">
-                                        {student.name || "N/A"}
+                                        {`${student.firstName} ${student.lastName}` || "N/A"}
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2">
-                                        {student.dateCreation}
+                                        {student.enrollmentDate}
                                     </td>
                                 </tr>
                             ))

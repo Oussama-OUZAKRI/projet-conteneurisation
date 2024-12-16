@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import photoProfil from '/photo-profil.jpg';
+import isTokenExpired from '../utils/isTokenExpired';
 
 const StudentDetails = () => {
     const [student, setStudent] = useState([]);
@@ -19,9 +20,19 @@ const StudentDetails = () => {
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const token = localStorage.getItem('jwtToken'); 
+    if (!token || isTokenExpired(token)) {
+        localStorage.removeItem('jwt');
+        navigate('/login'); 
+    }
+
     useEffect(() => {
         if (id) {
-            axios.get(`http://localhost:8080/api/v1/students/${id}`)
+            axios.get(`http://localhost:8080/api/v1/students/${id}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
                 .then(res => setStudent(res.data))
                 .catch(err => console.error(err))
         }
@@ -29,7 +40,11 @@ const StudentDetails = () => {
 
     useEffect(() => {
         if (id) {
-            axios.get(`http://localhost:8080/api/v1/students/${id}/courses`)
+            axios.get(`http://localhost:8080/api/v1/students/${id}/courses`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
             .then(res => setCourses(res.data))
             .catch(err => console.error(err))
         }
@@ -232,20 +247,26 @@ const StudentDetails = () => {
                 <tbody>
                     {courses.length > 0 ? (
                         courses.map((course, index) => (
-                            <tr key={index} className="hover:bg-gray-50 border-b">
-                            <td className="py-3 px-4 text-sm text-gray-800">{course.name}</td>
-                            <td className="py-3 px-4 text-sm text-gray-800">{course.grade}</td>
-                            <td className="py-3 px-4 text-sm text-gray-800">{course.instructor}</td>
+                            <tr
+                                key={index}
+                                className={`hover:bg-gray-50 border-b ${
+                                    course.grade >= 11 ? "bg-green-100" : "bg-red-100"
+                                }`}
+                            >
+                                <td className="py-3 px-4 text-sm text-gray-800">{course.name}</td>
+                                <td className="py-3 px-4 text-sm text-gray-800">{course.grade}</td>
+                                <td className="py-3 px-4 text-sm text-gray-800">{course.instructor}</td>
                             </tr>
-                        ))) : (
-                            <tr>
-                                <td
-                                    colSpan="3"
-                                    className="border border-gray-300 px-4 py-2 text-center text-gray-500"
-                                >
-                                    Aucun cours trouvé.
-                                </td>
-                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td
+                                colSpan="3"
+                                className="border border-gray-300 px-4 py-2 text-center text-gray-500"
+                            >
+                                Aucun cours trouvé.
+                            </td>
+                        </tr>
                     )}
                 </tbody>
             </table>

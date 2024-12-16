@@ -1,17 +1,35 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import isTokenExpired from '../utils/isTokenExpired';
 
 const StudentsList = () => {
     const [students, setStudents] = useState([]);
     const navigate = useNavigate(); 
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/v1/students')
-            .then(res => setStudents(res.data))
-            .catch(err => console.error(err));
+        const fetchStudents = async () => {
+            try {
+                const token = localStorage.getItem('jwtToken'); 
+                if (!token || isTokenExpired(token)) {
+                    localStorage.removeItem('jwt');
+                    navigate('/login'); 
+                }
+    
+                const response = await axios.get('http://localhost:8080/api/v1/students', {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Ajouter le token à l'en-tête
+                    },
+                });
+                setStudents(response.data);
+            } catch (err) {
+                console.error("Erreur lors de la récupération des étudiants:", err);
+            }
+        };
+    
+        fetchStudents();
     }, []);
-
+    
     const handleStudentDetail = (id) => {
         navigate(`/students/${id}`);
     };
@@ -39,7 +57,13 @@ const StudentsList = () => {
                     <tbody>
                         {students.length > 0 ? (
                             students.map((student) => (
-                                <tr key={student.id} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleStudentDetail(student.id)}>
+                                <tr
+                                    key={student.id}
+                                    className={`hover:bg-gray-100 cursor-pointer ${
+                                        student.gpa >= 11 ? 'bg-green-100' : 'bg-red-100'
+                                    }`}
+                                    onClick={() => handleStudentDetail(student.id)}
+                                >
                                     <td className="border border-gray-300 px-4 py-2">
                                         {student.id}
                                     </td>

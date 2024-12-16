@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import isTokenExpired from '../utils/isTokenExpired';
 
 const StudentForm = () => {
     const [formData, setFormData] = useState({
@@ -35,7 +36,16 @@ const StudentForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
-        axios.post("http://localhost:8080/api/v1/students", formData)
+        const token = localStorage.getItem('jwtToken'); 
+        if (!token || isTokenExpired(token)) {
+            localStorage.removeItem('jwt');
+            navigate('/login'); 
+        }
+        axios.post("http://localhost:8080/api/v1/students", formData,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then((res) => {
                 setResponseStatus({
                     status: true,

@@ -12,8 +12,6 @@ const StudentsList = () => {
             .catch(err => console.error(err));
     }, []);
 
-    console.log(students);
-    
     const handleStudentDetail = (id) => {
         navigate(`/students/${id}`);
     };

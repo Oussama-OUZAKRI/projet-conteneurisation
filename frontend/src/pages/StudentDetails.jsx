@@ -4,7 +4,18 @@ import axios from 'axios';
 import photoProfil from '/photo-profil.jpg';
 
 const StudentDetails = () => {
-    const [student, setStudent] = useState(null);
+    const [student, setStudent] = useState([]);
+    const [courses, setCourses] = useState([]);
+    const [isFormVisible, setIsFormVisible] = useState(false);
+    const [newCourse, setNewCourse] = useState({
+        name: '',
+        grade: '',
+        instructor: ''
+    });
+    const [responseStatus, setResponseStatus] = useState({
+        status: null,
+        response: "",
+    });
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -16,11 +27,58 @@ const StudentDetails = () => {
         }
     }, [id]);
 
+    useEffect(() => {
+        if (id) {
+            axios.get(`http://localhost:8080/api/v1/students/${id}/courses`)
+            .then(res => setCourses(res.data))
+            .catch(err => console.error(err))
+        }
+    }, [id, responseStatus])
+
     const handleClickPrevious = () => {
         navigate("/");
     };
 
-    if (!student) {
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewCourse({
+            ...newCourse,
+            [name]: value
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (newCourse.name && newCourse.grade && newCourse.instructor) {
+            axios.post(`http://localhost:8080/api/v1/students/${student.id}/courses`, newCourse)
+                .then(res => {
+                    setNewCourse({ name: '', grade: '', instructor: '' });
+                    setIsFormVisible(false);
+                    setResponseStatus({
+                        status: true,
+                        response: "Course added successfully!",
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    setResponseStatus({
+                        status: false,
+                        response: "Error while adding the course!",
+                    });
+                })
+        }
+    };
+
+    useEffect(() => {
+        if (responseStatus.response) {
+            const timer = setTimeout(() => {
+                setResponseStatus({ status: null, response: "" });
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [responseStatus]);
+
+    if (!student && !courses) {
         return (
             <div className="container mx-auto p-6 text-center">
                 <p className="text-gray-500">Chargement des données de l'étudiant...</p>
@@ -29,6 +87,7 @@ const StudentDetails = () => {
     }
 
     return (
+    <>
         <div className="container mx-auto my-8 p-6 bg-gray-50 rounded-lg shadow-lg border border-gray-200 relative">
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-3xl font-bold text-gray-900">Profil de l'étudiant {student.firstName}</h2>
@@ -107,13 +166,111 @@ const StudentDetails = () => {
                     ))}
                 </div>
             </section>
+        </div>
+        <div className="container mx-auto my-8 p-6 bg-gray-50 rounded-lg shadow-lg border border-gray-200">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Liste des Cours</h2>
+            <button
+                onClick={() => setIsFormVisible(!isFormVisible)}
+                className="mb-4 py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all"
+            >
+                {isFormVisible ? 'Annuler' : 'Ajouter un cours'}
+            </button>
+
+            {/* Formulaire d'ajout de cours */}
+            {isFormVisible && (
+                <form onSubmit={handleSubmit} className="mb-6 p-4 bg-white rounded-lg shadow-md">
+                    <div className="mb-4">
+                        <label className="block text-sm font-semibold text-gray-700">Nom du cours</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={newCourse.name}
+                            onChange={handleInputChange}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-sm font-semibold text-gray-700">Note</label>
+                        <input
+                            type="number"
+                            name="grade"
+                            value={newCourse.grade}
+                            onChange={handleInputChange}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-sm font-semibold text-gray-700">Professeur</label>
+                        <input
+                            type="text"
+                            name="instructor"
+                            value={newCourse.instructor}
+                            onChange={handleInputChange}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            required
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 transition-all"
+                    >
+                        Ajouter le cours
+                    </button>
+                </form>
+            )}
+
+            <table className="min-w-full bg-white table-auto border-collapse">
+                <thead>
+                    <tr className="bg-gray-100 border-b">
+                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Nom du cours</th>
+                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Note</th>
+                        <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Professeur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {courses.length > 0 ? (
+                        courses.map((course, index) => (
+                            <tr key={index} className="hover:bg-gray-50 border-b">
+                            <td className="py-3 px-4 text-sm text-gray-800">{course.name}</td>
+                            <td className="py-3 px-4 text-sm text-gray-800">{course.grade}</td>
+                            <td className="py-3 px-4 text-sm text-gray-800">{course.instructor}</td>
+                            </tr>
+                        ))) : (
+                            <tr>
+                                <td
+                                    colSpan="3"
+                                    className="border border-gray-300 px-4 py-2 text-center text-gray-500"
+                                >
+                                    Aucun cours trouvé.
+                                </td>
+                            </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+        <div className="w-full text-center">
             <button
                 onClick={handleClickPrevious}
-                className="mt-4 py-2 px-4 bg-gray-300 text-gray-800 hover:bg-gray-400 rounded-md transition-all"
+                className="bg-gray-300 text-gray-800 hover:bg-gray-400 rounded-md transition-all mb-8 py-2 px-4"
             >
                 Back
             </button>
         </div>
+        {responseStatus.response && (
+            <div
+                className={`fixed top-4 left-1/2 transform -translate-x-1/2 mt-4 p-4 rounded shadow-lg transition-opacity duration-300 ${
+                    responseStatus.status
+                        ? "bg-green-100 text-green-700 border border-green-300 opacity-100"
+                        : "bg-red-100 text-red-700 border border-red-300 opacity-100"
+                }`}
+                style={{ opacity: responseStatus.response ? 1 : 0 }}
+            >
+                {responseStatus.response}
+            </div>
+        )}
+    </>
     );
 };
 

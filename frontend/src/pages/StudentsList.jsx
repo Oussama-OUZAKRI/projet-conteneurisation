@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const StudentsList = () => {
     const [students, setStudents] = useState([]);
     const navigate = useNavigate(); 
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/v1/students')
-            .then(res => res.json())
-            .then(data => setStudents(data))
+        axios.get('http://localhost:8080/api/v1/students')
+            .then(res => setStudents(res.data))
             .catch(err => console.error(err));
     }, []);
 

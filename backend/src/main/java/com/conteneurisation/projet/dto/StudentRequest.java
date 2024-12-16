@@ -1,5 +1,6 @@
 package com.conteneurisation.projet.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.NotBlank;
@@ -24,9 +25,8 @@ public class StudentRequest {
     @NotBlank(message = "Email cannot be empty")
     private String email;
 
-    @NotNull(message = "Phone number cannot be null")
-    @Positive(message = "Phone number must be positive")
-    private int phoneNumber;
+    @NotBlank(message = "Phone number must be empty")
+    private String phoneNumber;
 
     @NotBlank(message = "Gender cannot be empty")
     private String gender;
@@ -41,7 +41,7 @@ public class StudentRequest {
     private String major;
 
     @NotNull(message = "Le GPA ne peut pas être nul")
-    private float gpa;
+    private BigDecimal gpa;
 
     @Positive(message = "Year of study must be a positive number")
     private int yearOfStudy;

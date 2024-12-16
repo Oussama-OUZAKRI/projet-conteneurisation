@@ -35,8 +35,7 @@ const StudentForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
-        axios
-            .post("http://localhost:8080/api/v1/students", formData)
+        axios.post("http://localhost:8080/api/v1/students", formData)
             .then((res) => {
                 setResponseStatus({
                     status: true,

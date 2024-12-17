@@ -5,6 +5,7 @@ import StudentsList from './pages/StudentsList';
 import StudentForm from './pages/StudentForm';
 import LoginForm from './pages/LoginForm';
 import ProtectedRoute from './utils/ProtectedRoute';
+import RegistrationForm from './pages/RegisterForm';
 
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem('jwtToken') || '');
@@ -24,6 +25,7 @@ const App = () => {
         <Routes>
           {/* Route Login */}
           <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
+          <Route path="/register" element={<RegistrationForm />} />
 
           {/* Routes Protégées */}
           <Route element={<ProtectedRoute token={token} />}>

@@ -58,7 +58,7 @@ const LoginForm = ({ onLogin }) => {
     
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
             <form
                 onSubmit={handleSubmit}
                 className="bg-white p-6 rounded-lg shadow-lg w-80"
@@ -100,6 +100,12 @@ const LoginForm = ({ onLogin }) => {
                     Se connecter
                 </button>
             </form>
+            <button
+                className="w-80 mt-8 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1"
+                onClick={() => navigate("/register")}
+            >
+                S'inscrire
+            </button>
         </div>
     );
 };

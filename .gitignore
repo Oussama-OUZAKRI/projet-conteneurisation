@@ -12,3 +12,4 @@ frontend/.gitignore
 frontend/README.md
 
 .vscode
+.idea

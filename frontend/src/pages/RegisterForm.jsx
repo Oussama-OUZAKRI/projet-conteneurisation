@@ -28,7 +28,7 @@ const RegistrationForm = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:8080/api/v1/auth/register',
+                `http://backend.local/api/v1/auth/register`,
                 {
                     name: formData.name,
                     email: formData.username,

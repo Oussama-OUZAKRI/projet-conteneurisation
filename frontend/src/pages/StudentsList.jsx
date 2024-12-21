@@ -16,7 +16,7 @@ const StudentsList = () => {
                     navigate('/login'); 
                 }
     
-                const response = await axios.get('http://localhost:8080/api/v1/students', {
+                const response = await axios.get(`http://backend.local/api/v1/students`, {
                     headers: {
                         Authorization: `Bearer ${token}`, // Ajouter le token à l'en-tête
                     },

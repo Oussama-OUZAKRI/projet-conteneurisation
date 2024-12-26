@@ -21,6 +21,7 @@ ENV NODE_ENV=production
 
 # Copier les fichiers générés depuis la phase de build
 COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exposer le port 80
 EXPOSE 80

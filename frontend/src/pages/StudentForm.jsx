@@ -41,7 +41,7 @@ const StudentForm = () => {
             localStorage.removeItem('jwt');
             navigate('/login'); 
         }
-        axios.post(`http://backend.local/api/v1/students`, formData,{
+        axios.post(`${import.meta.env.VITE_API_URL}/api/v1/students`, formData,{
             headers: {
                 Authorization: `Bearer ${token}`,
             },

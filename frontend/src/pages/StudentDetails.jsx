@@ -28,7 +28,7 @@ const StudentDetails = () => {
 
     useEffect(() => {
         if (id) {
-            axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/students/${id}`,{
+            axios.get(`${import.meta.env.VITE_API_URL}/api/v1/students/${id}`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -40,7 +40,7 @@ const StudentDetails = () => {
 
     useEffect(() => {
         if (id) {
-            axios.get(`http://backend.local/api/v1/students/${id}/courses`,{
+            axios.get(`${import.meta.env.VITE_API_URL}/api/v1/students/${id}/courses`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -65,7 +65,7 @@ const StudentDetails = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (newCourse.name && newCourse.grade && newCourse.instructor) {
-            axios.post(`http://backend.local/api/v1/students/${student.id}/courses`, newCourse)
+            axios.post(`${import.meta.env.VITE_API_URL}/api/v1/students/${student.id}/courses`, newCourse)
                 .then(res => {
                     setNewCourse({ name: '', grade: '', instructor: '' });
                     setIsFormVisible(false);

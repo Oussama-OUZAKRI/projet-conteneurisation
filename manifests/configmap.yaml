@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: exam
+data:
+  SPRING_DATASOURCE_URL: "jdbc:mysql://database-service:3306/t_students"

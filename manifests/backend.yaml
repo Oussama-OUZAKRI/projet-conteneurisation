@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: exam
+data:
+  SPRING_DATASOURCE_URL: "jdbc:mysql://database-service:3306/t_students"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: exam
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: exam
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      initContainers:
+      - name: wait-for-database
+        image: busybox
+        command:
+        - sh
+        - "-c"
+        - |
+          until nc -z database-service 3306; do
+            echo "Waiting for database to be ready...";
+            sleep 5;
+          done;
+        resources:
+          requests:
+            memory: "250Mi"
+            cpu: "250m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+      containers:
+      - name: backend
+        image: oussama2003/backend-app:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: backend-config
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "500m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        startupProbe:  
+          httpGet:  
+            path: /api/health  
+            port: 8080  
+          initialDelaySeconds: 120  
+          periodSeconds: 10  
+          timeoutSeconds: 10  
+          failureThreshold: 3  
+        readinessProbe:  
+          httpGet:  
+            path: /api/health  
+            port: 8080  
+          initialDelaySeconds: 120  
+          periodSeconds: 10  
+          timeoutSeconds: 10  
+          failureThreshold: 3  
+        livenessProbe:  
+          httpGet:  
+            path: /api/health  
+            port: 8080  
+          initialDelaySeconds: 120  
+          periodSeconds: 10  
+          timeoutSeconds: 10  
+          failureThreshold: 3 
